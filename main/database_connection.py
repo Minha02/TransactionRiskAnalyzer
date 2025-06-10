@@ -7,6 +7,8 @@ from sqlalchemy.exc import SQLAlchemyError
 class DatabaseManager:
     @staticmethod
     def save_transaction_analysis(transaction_data, llm_response):
+        #print(transaction_data)
+        print(f"Transaction data: {transaction_data}")
         """Save transaction analysis to database"""
         try:
             analysis = TransactionAnalysis(
