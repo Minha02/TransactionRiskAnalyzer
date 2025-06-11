@@ -19,14 +19,14 @@ def analyse_transaction_deepseek(data,save_to_db=True,prompt_file_path='transact
             prompt_template = file.read()
 
         prompt = prompt_template.replace('{transaction_data}', json.dumps(data))
-        
-        data = {
+
+        data_prompt = {
             "model": "deepseek/deepseek-chat:free",
             "messages": [{"role": "user", "content": prompt}]
         }
 
         # Send the POST request to the DeepSeek API
-        response = requests.post(API_URL, json=data, headers=headers)
+        response = requests.post(API_URL, json=data_prompt, headers=headers)
 
         if response.status_code != 200:
             raise Exception(f"Error code: {response.status_code} - {response.text}")
@@ -59,6 +59,7 @@ def analyse_transaction_deepseek(data,save_to_db=True,prompt_file_path='transact
 
         if save_to_db:
             try:
+                print(f"DATAAAAAA........................... {data}")
                 analysis_id = DatabaseManager.save_transaction_analysis(data, result)
                 result['analysis_id'] = analysis_id
                 print(f"💾 Saved to database with ID: {analysis_id}")

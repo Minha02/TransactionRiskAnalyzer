@@ -58,6 +58,20 @@ class DatabaseManager:
         except Exception as e:
             print(f"❌ Error retrieving analyses: {str(e)}")
             return []
+        
+    @staticmethod
+    def get_high_risk_analyses(limit=100, offset=0):
+        """Retrieve high-risk transaction analyses (risk_score > 0.7)"""
+        try:
+            analyses = TransactionAnalysis.query.filter(
+                TransactionAnalysis.risk_score > 0.7
+            ).order_by(TransactionAnalysis.created_at.desc()).offset(offset).limit(limit).all()
+            
+            return [analysis.to_dict() for analysis in analyses]
+        except Exception as e:
+            print(f"❌ Error retrieving high-risk analyses: {str(e)}")
+            return []
+
 
     
 
