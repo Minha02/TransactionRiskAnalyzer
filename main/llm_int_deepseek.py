@@ -13,56 +13,13 @@ headers = {
     'Content-Type': 'application/json'
 }
 
-def analyse_transaction_deepseek(data,save_to_db=True):
+def analyse_transaction_deepseek(data,save_to_db=True,prompt_file_path='transaction_risk_analysis_prompt.txt'):
     try:
-        prompt = f"""
-        # Transaction Risk Analysis Prompt
-            ## System Instructions
-            You are a specialised financial risk analyst. Your task is to evaluate
-            transaction data and determine a risk score from 0.0 (no risk) to 1.0
-            (extremely high risk) based on patterns and indicators of potential fraud.
-            You must also provide clear reasoning for your risk assessment.
-            ## Response Format
-            Respond in JSON format with the following structure:
-        {{
-            "risk_score": 0.0-1.0,
-            "risk_factors": ["factor1", "factor2", ...],
-            "reasoning": "short explanation",
-            "recommended_action": "allow | review | block"
-        }}
-        ## Risk Factors to Consider
-            1. **Geographic Anomalies**:
-            - Transactions where the customer country differs from the payment
-            method country
+        with open(prompt_file_path, 'r', encoding='utf-8') as file:
+            prompt_template = file.read()
 
-            - Transactions from high-risk countries (consider jurisdiction with
-            weak AML controls)
-            - IP address location inconsistent with the customer's country
-            2. **Transaction Patterns**:
-            - Unusual transaction amount for the merchant category
-            - Transactions outside normal business hours for the merchant's
-            location
-            - Multiple transactions in short succession
-            3. **Payment Method Indicators**:
-            - Payment method type and associated risks
-            - New payment methods have recently been added to accounts
-            4. **Merchant Factors**:
-            - Merchant category and typical fraud rates
-            - Merchant's history and reputation
-            ## Additional Guidelines
-            - Assign higher risk scores to combinations of multiple risk factors
-            - Consider the transaction amount - higher amounts generally warrant more
-            scrutiny
-            - Account for normal cross-border shopping patterns while flagging unusual
-            combinations
-            - Provide actionable reasoning that explains why the transaction received
-            its risk score
-            - Recommend "allow" for scores 0.0-0.3, "review" for scores 0.3-0.7, and
-            "block" for scores 0.7-1.0
-            ## Transaction Data
-            {json.dumps(data)}
-        """
-
+        prompt = prompt_template.replace('{transaction_data}', json.dumps(data))
+        
         data = {
             "model": "deepseek/deepseek-chat:free",
             "messages": [{"role": "user", "content": prompt}]
