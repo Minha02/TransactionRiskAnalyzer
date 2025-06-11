@@ -4,11 +4,12 @@ from validator import validate_transaction
 from database_connection import DatabaseManager
 from llm_integrator import analyse_transaction
 from llm_int_deepseek import analyse_transaction_deepseek
+from authenticator import require_auth
 
 main_bp = Blueprint('main', __name__)
 
 @main_bp.route("/transaction", methods=["POST"])
-#@require_auth
+@require_auth
 def create_transaction():
     try:
         transaction = request.get_json(force=True)
