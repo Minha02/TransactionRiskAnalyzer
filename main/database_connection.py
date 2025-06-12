@@ -32,17 +32,6 @@ class DatabaseManager:
             raise
 
     @staticmethod
-    def get_transaction_analysis(analysis_id):
-        try:
-            analysis = TransactionAnalysis.query.get(analysis_id)
-            if not analysis:
-                return None
-            return analysis.to_dict()
-        except Exception as e:
-            print(f"Error retrieving analysis {analysis_id}: {str(e)}")
-            return None
-
-    @staticmethod
     def get_all_analyses(limit=100, offset=0):
         try:
             analyses = TransactionAnalysis.query.order_by(

@@ -15,7 +15,6 @@ class TransactionAnalysis(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     def to_dict(self):
-        """Convert model to dictionary"""
         try:
             return {
                 'id': self.id,
@@ -28,7 +27,7 @@ class TransactionAnalysis(db.Model):
                 'updated_at': self.updated_at.isoformat() if self.updated_at else None
             }
         except json.JSONDecodeError as e:
-            print(f"❌ JSON decode error in model {self.id}: {str(e)}")
+            print(f"JSON decode error in model {self.id}: {str(e)}")
             return {
                 'id': self.id,
                 'transaction_data': {},

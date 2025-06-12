@@ -1,7 +1,6 @@
 from flask import Blueprint, request, jsonify, abort
 from .get_financial_risk import get_financial_risk_analysis, get_high_risk_history, get_risk_history
 from .validator import validate_transaction
-from .llm_integrator import analyse_transaction
 from .llm_int_deepseek import analyse_transaction_deepseek
 from .authenticator import require_auth
 import json
@@ -12,14 +11,10 @@ main_bp = Blueprint('main', __name__)
 @require_auth
 def create_transaction():
     try:
-        # Get and validate transaction data
         transaction = request.get_json(force=True)
         validate_transaction(transaction)
         
-        # Analyze the transaction
         llm_response = analyse_transaction_deepseek(transaction)
-        
-        # Save to database if successful
         get_financial_risk_analysis(transaction, save_to_db=True)
         
         return jsonify({
@@ -40,14 +35,11 @@ def create_transaction():
 @require_auth
 def get_analyses():
     try:
-        # Get the risk_level parameter from the request
         risk_level = request.args.get('risk_level', None)
         
         if risk_level == 'high':
-            # Use the high risk function if specifically requesting high risk transactions
             analyses = get_high_risk_history()
         else:
-            # Otherwise get all analyses
             analyses = get_risk_history()
             
         if analyses is None:

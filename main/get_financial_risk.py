@@ -7,10 +7,7 @@ def get_financial_risk_analysis(data,save_to_db=True):
     try:
         if not validate_transaction(data):
             raise ValueError("Invalid transaction data format")
-        
-        print("Starting financial risk analysis...")
-        
-        # Get LLM analysis
+                
         llm_response = analyse_transaction_deepseek(data)
         return jsonify({
             "message": "Transaction validated and analyzed.",
@@ -25,7 +22,6 @@ def get_financial_risk_analysis(data,save_to_db=True):
 
 
 def get_risk_history():
-    """Get historical risk analyses"""
     try:
         analyses = DatabaseManager.get_all_analyses()
         if analyses is None:
@@ -36,11 +32,9 @@ def get_risk_history():
         return jsonify({"error": "Failed to retrieve analyses"}), 500
 
 def get_high_risk_history():
-    """Get high-risk transaction history"""
     try:
         analyses = DatabaseManager.get_high_risk_analyses()
         if analyses is None:
-            print("NONE.......")
             return []
         return analyses
     except Exception as e:
