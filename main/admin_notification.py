@@ -2,7 +2,7 @@ from datetime import datetime
 import json
 import logging
 from typing import Dict, Any, List
-from database_connection import DatabaseManager
+from .database_connection import DatabaseManager
 
 class AdminNotificationService:
     def __init__(self):

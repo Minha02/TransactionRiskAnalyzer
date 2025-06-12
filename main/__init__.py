@@ -16,13 +16,12 @@ def create_app():
 
     db.init_app(app)
 
-    #from . import models
-    from models import TransactionAnalysis
+    from .models import TransactionAnalysis
 
     with app.app_context():
         db.create_all()
 
-    from controller import main_bp
+    from .controller import main_bp
 
     app.register_blueprint(main_bp)
 

@@ -1,4 +1,4 @@
-from __init__ import db 
+from main import db 
 from datetime import datetime
 import json 
 

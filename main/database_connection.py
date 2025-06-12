@@ -1,5 +1,5 @@
-from __init__ import db
-from models import TransactionAnalysis
+from main import db
+from .models import TransactionAnalysis
 import json
 from datetime import datetime
 from sqlalchemy.exc import SQLAlchemyError

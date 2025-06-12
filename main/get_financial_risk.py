@@ -1,6 +1,6 @@
-from llm_int_deepseek import analyse_transaction_deepseek
-from database_connection import DatabaseManager
-from validator import validate_transaction
+from .llm_int_deepseek import analyse_transaction_deepseek
+from .database_connection import DatabaseManager
+from .validator import validate_transaction
 from flask import jsonify
 
 def get_financial_risk_analysis(data,save_to_db=True):

@@ -1,9 +1,9 @@
 from flask import Blueprint, request, jsonify, abort
-from get_financial_risk import get_financial_risk_analysis, get_high_risk_history
-from validator import validate_transaction
-from llm_integrator import analyse_transaction
-from llm_int_deepseek import analyse_transaction_deepseek
-from authenticator import require_auth
+from .get_financial_risk import get_financial_risk_analysis, get_high_risk_history
+from .validator import validate_transaction
+from .llm_integrator import analyse_transaction
+from .llm_int_deepseek import analyse_transaction_deepseek
+from .authenticator import require_auth
 import json
 
 main_bp = Blueprint('main', __name__)
