@@ -9,25 +9,18 @@ class AdminNotificationService:
         self.logger = logging.getLogger(__name__)
         
     def should_notify_admins(self, transaction: Dict[str, Any], llm_analysis: Dict[str, Any]) -> bool:
-        """
-        Determine if a transaction warrants admin notification based on LLM risk analysis
-        """
+
         risk_score = llm_analysis.get('risk_score', 0.0)
-        recommended_action = llm_analysis.get('recommended_action', 'allow').lower()
         
         # Notify admins for high-risk transactions
         high_risk_criteria = [
             risk_score >= 0.7,  # High risk score (block threshold)
-            recommended_action in ['block', 'review'],
             risk_score >= 0.5 and transaction.get('amount', 0) > 5000,  # Medium risk + high amount
         ]
         
         return any(high_risk_criteria)
     
     def create_admin_notification(self, transaction: Dict[str, Any], llm_analysis: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Create admin notification in the specified format
-        """
         try:
             if not self.should_notify_admins(transaction, llm_analysis):
                 return {'created': False, 'reason': 'Transaction does not meet notification criteria'}
@@ -36,10 +29,7 @@ class AdminNotificationService:
             risk_score = llm_analysis.get('risk_score', 0.0)
             recommended_action = llm_analysis.get('recommended_action', 'allow')
             
-            if risk_score >= 0.8 or recommended_action == 'block':
-                alert_type = 'critical_risk_transaction'
-                priority = 'critical'
-            elif risk_score >= 0.7 or recommended_action == 'review':
+            if risk_score >= 0.7 or recommended_action == 'review':
                 alert_type = 'high_risk_transaction'
                 priority = 'high'
             elif risk_score >= 0.5:
@@ -75,24 +65,9 @@ class AdminNotificationService:
                 'transaction_id': transaction_id,
                 'risk_score': risk_score,
                 'risk_factors': llm_analysis.get('risk_factors', []),
-                'recommended_action': recommended_action,
                 'reasoning': llm_analysis.get('reasoning', 'No reasoning provided'),
-                'transaction_summary': {
-                    'amount': f"{currency} {amount:,.2f}",
-                    'customer_country': customer_country,
-                    'payment_country': card_country,
-                    'merchant_name': merchant_name,
-                    'merchant_category': merchant_category,
-                    'payment_type': payment_type,
-                    'timestamp': transaction.get('timestamp', datetime.now().isoformat())
-                },
-                'geographic_flags': self.extract_geographic_flags(transaction),
                 'transaction_details': transaction,  # Full transaction JSON
                 'llm_analysis': llm_analysis.get('reasoning', 'Risk analysis completed'),
-                'priority': priority,
-                'status': 'unread',
-                'created_at': datetime.now().isoformat(),
-                'requires_immediate_action': recommended_action == 'block'
             }
             
             # Save to database
@@ -111,26 +86,3 @@ class AdminNotificationService:
         except Exception as e:
             self.logger.error(f"Error creating admin notification: {str(e)}")
             return {'created': False, 'error': str(e)}
-    
-    def extract_geographic_flags(self, transaction: Dict[str, Any]) -> List[str]:
-        """Extract geographic risk indicators"""
-        flags = []
-        
-        customer = transaction.get('customer', {})
-        payment_method = transaction.get('payment_method', {})
-        
-        customer_country = customer.get('country', '')
-        card_country = payment_method.get('country_of_issue', '')
-        
-        if customer_country and card_country and customer_country != card_country:
-            flags.append(f"Cross-border: Customer in {customer_country}, Card from {card_country}")
-        
-        # Add high-risk country flags (you can customize this list)
-        high_risk_countries = ['XX', 'YY']  # Replace with actual high-risk country codes
-        if customer_country in high_risk_countries:
-            flags.append(f"High-risk customer location: {customer_country}")
-        
-        if card_country in high_risk_countries:
-            flags.append(f"High-risk card issuer country: {card_country}")
-        
-        return flags

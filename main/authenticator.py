@@ -1,5 +1,5 @@
 from functools import wraps
-from flask import json, request, abort
+from flask import request, abort
 import os
 from dotenv import load_dotenv
 

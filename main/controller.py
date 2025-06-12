@@ -1,7 +1,6 @@
 from flask import Blueprint, request, jsonify, abort
-from get_financial_risk import get_financial_risk_analysis, get_risk_history, get_high_risk_history
+from get_financial_risk import get_financial_risk_analysis, get_high_risk_history
 from validator import validate_transaction
-from database_connection import DatabaseManager
 from llm_integrator import analyse_transaction
 from llm_int_deepseek import analyse_transaction_deepseek
 from authenticator import require_auth
@@ -14,10 +13,8 @@ main_bp = Blueprint('main', __name__)
 def create_transaction():
     try:
         transaction = request.get_json(force=True)
+        get_financial_risk_analysis(transaction,save_to_db=True)
         validate_transaction(transaction)
-        # Here, you could add code to save or process the transaction
-
-        #return jsonify({"message": "Transaction validated and processed successfully."}), 201
     
         llm_response = analyse_transaction_deepseek(transaction)
         return jsonify({
@@ -32,13 +29,13 @@ def create_transaction():
         return jsonify({"error": "Internal server error", "details": str(e)}), 500
     
 @main_bp.route("/analyses", methods=["GET"])
-#@require_auth
+@require_auth
 def get_analyses():
     try:
         limit = request.args.get('limit',50, type=int)
         offset = request.args.get('offset', 0, type=int)
 
-        analyses = DatabaseManager.get_all_analyses(limit=limit, offset=offset)
+        analyses = get_high_risk_history()
 
         return jsonify({
             'success': True,
@@ -51,17 +48,16 @@ def get_analyses():
 
 
 @main_bp.route("/admin/notifications", methods=["GET"])
-@require_auth  # Optional: Secure it
+@require_auth  
 def get_admin_notifications():
     try:
         limit = request.args.get('limit', 50, type=int)
         offset = request.args.get('offset', 0, type=int)
 
-        high_risk_analyses = DatabaseManager.get_high_risk_analyses(limit=limit, offset=offset)
+        high_risk_analyses = get_high_risk_history()
         notifications = []
 
         for analysis in high_risk_analyses:
-            # Safely parse fields only if they're strings
             transaction_data = analysis["transaction_data"]
             if isinstance(transaction_data, str):
                 transaction_data = json.loads(transaction_data)

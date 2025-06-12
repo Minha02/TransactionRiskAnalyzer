@@ -7,9 +7,6 @@ from sqlalchemy.exc import SQLAlchemyError
 class DatabaseManager:
     @staticmethod
     def save_transaction_analysis(transaction_data, llm_response):
-        #print(transaction_data)
-        print(f"Transaction data: {transaction_data}")
-        """Save transaction analysis to database"""
         try:
             analysis = TransactionAnalysis(
                 transaction_data=json.dumps(transaction_data) if isinstance(transaction_data, dict) else transaction_data,
@@ -22,33 +19,31 @@ class DatabaseManager:
             db.session.add(analysis)
             db.session.commit()
             
-            print(f"✅ Saved transaction analysis with ID: {analysis.id}")
+            print(f"Saved transaction analysis with ID: {analysis.id}")
             return analysis.id
             
         except SQLAlchemyError as e:
             db.session.rollback()
-            print(f"❌ Database error: {str(e)}")
+            print(f" Database error: {str(e)}")
             raise Exception(f"Failed to save transaction analysis: {str(e)}")
         except Exception as e:
             db.session.rollback()
-            print(f"❌ Unexpected error: {str(e)}")
+            print(f"Unexpected error: {str(e)}")
             raise
 
     @staticmethod
     def get_transaction_analysis(analysis_id):
-        """Retrieve specific transaction analysis by ID"""
         try:
             analysis = TransactionAnalysis.query.get(analysis_id)
             if not analysis:
                 return None
             return analysis.to_dict()
         except Exception as e:
-            print(f"❌ Error retrieving analysis {analysis_id}: {str(e)}")
+            print(f"Error retrieving analysis {analysis_id}: {str(e)}")
             return None
 
     @staticmethod
     def get_all_analyses(limit=100, offset=0):
-        """Retrieve all transaction analyses with pagination"""
         try:
             analyses = TransactionAnalysis.query.order_by(
                 TransactionAnalysis.created_at.desc()
@@ -56,20 +51,19 @@ class DatabaseManager:
             
             return [analysis.to_dict() for analysis in analyses]
         except Exception as e:
-            print(f"❌ Error retrieving analyses: {str(e)}")
+            print(f"Error retrieving analyses: {str(e)}")
             return []
         
     @staticmethod
-    def get_high_risk_analyses(limit=100, offset=0):
-        """Retrieve high-risk transaction analyses (risk_score > 0.7)"""
+    def get_high_risk_analyses():
         try:
             analyses = TransactionAnalysis.query.filter(
                 TransactionAnalysis.risk_score > 0.7
-            ).order_by(TransactionAnalysis.created_at.desc()).offset(offset).limit(limit).all()
-            
+            ).order_by(TransactionAnalysis.created_at.desc()).all()
+
             return [analysis.to_dict() for analysis in analyses]
         except Exception as e:
-            print(f"❌ Error retrieving high-risk analyses: {str(e)}")
+            print(f"Error retrieving high-risk analyses: {str(e)}")
             return []
 
 

@@ -41,7 +41,6 @@ def analyse_transaction_deepseek(data,save_to_db=True,prompt_file_path='transact
         result_text = response.json()["choices"][0]["message"]["content"]
         print(f"Result Text: {result_text}")
 
-        # Remove Markdown formatting (```json ... ```)
         if result_text.startswith("```json"):
             result_text = result_text.strip("```json").strip("```").strip()
 
@@ -49,7 +48,6 @@ def analyse_transaction_deepseek(data,save_to_db=True,prompt_file_path='transact
         if not result_text.strip():
             raise Exception("Empty result text from API")
 
-        # Parse the JSON content from the response
         result = json.loads(result_text)
 
         print(f"Parsed Result: {result}")
@@ -59,14 +57,11 @@ def analyse_transaction_deepseek(data,save_to_db=True,prompt_file_path='transact
 
         if save_to_db:
             try:
-                print(f"DATAAAAAA........................... {data}")
                 analysis_id = DatabaseManager.save_transaction_analysis(data, result)
                 result['analysis_id'] = analysis_id
-                print(f"💾 Saved to database with ID: {analysis_id}")
+                print(f"Saved to database with ID: {analysis_id}")
             except Exception as db_error:
-                print(f"⚠️ Database save failed: {str(db_error)}")
-                # Continue without failing the entire request
-
+                print(f"Database save failed: {str(db_error)}")
 
         return result
 
