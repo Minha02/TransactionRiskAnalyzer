@@ -134,3 +134,4 @@ def test_nested_field_validation():
     with pytest.raises(ValueError) as exc_info:
         validate_transaction(invalid_customer)
     assert "Missing required customer field: id" in str(exc_info.value)
+

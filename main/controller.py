@@ -40,7 +40,16 @@ def create_transaction():
 @require_auth
 def get_analyses():
     try:
-        analyses = get_risk_history()
+        # Get the risk_level parameter from the request
+        risk_level = request.args.get('risk_level', None)
+        
+        if risk_level == 'high':
+            # Use the high risk function if specifically requesting high risk transactions
+            analyses = get_high_risk_history()
+        else:
+            # Otherwise get all analyses
+            analyses = get_risk_history()
+            
         if analyses is None:
             analyses = []
 
