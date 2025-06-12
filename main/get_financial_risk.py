@@ -24,10 +24,25 @@ def get_financial_risk_analysis(data,save_to_db=True):
         return jsonify({"error": "Internal server error", "details": str(e)}), 500
 
 
-def get_risk_history(limit=50):
+def get_risk_history():
     """Get historical risk analyses"""
-    return DatabaseManager.get_all_analyses(limit=limit)
+    try:
+        analyses = DatabaseManager.get_all_analyses()
+        if analyses is None:
+            return []
+        return analyses
+    except Exception as e:
+        print(f"Error getting analyses: {str(e)}")
+        return jsonify({"error": "Failed to retrieve analyses"}), 500
 
 def get_high_risk_history():
     """Get high-risk transaction history"""
-    return DatabaseManager.get_high_risk_analyses()
+    try:
+        analyses = DatabaseManager.get_high_risk_analyses()
+        if analyses is None:
+            print("NONE.......")
+            return []
+        return analyses
+    except Exception as e:
+        print(f"Error getting analyses: {str(e)}")
+        return jsonify({"error": "Failed to retrieve analyses"}), 500
