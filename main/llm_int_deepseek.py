@@ -1,4 +1,5 @@
 import os
+from importlib import resources
 import json
 import requests
 from flask import abort
@@ -13,15 +14,24 @@ headers = {
     'Content-Type': 'application/json'
 }
 
+def get_prompt_path():
+    """Get the path to the prompt file regardless of how the package is installed"""
+    try:
+        with resources.files('main').joinpath('transaction_risk_analysis_prompt.txt') as path:
+            return str(path)
+    except (ImportError, TypeError):
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        return os.path.join(current_dir, 'transaction_risk_analysis_prompt.txt')
+
+
 def analyse_transaction_deepseek(data,save_to_db=True,prompt_file_path='transaction_risk_analysis_prompt.txt'):
     try:
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        prompt_file_path = os.path.join(current_dir, 'transaction_risk_analysis_prompt.txt')
+        prompt_file_path = get_prompt_path()
 
         with open(prompt_file_path, 'r', encoding='utf-8') as file:
             prompt_template = file.read()
         prompt = prompt_template.replace('{transaction_data}', json.dumps(data))
-
+        
         data_prompt = {
             "model": "deepseek/deepseek-chat:free",
             "messages": [{"role": "user", "content": prompt}]
