@@ -4,7 +4,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))
 import pytest
 from flask import Flask
 from main.controller import main_bp
-from main.database_connection import DatabaseManager
+from main.database_manager import DatabaseManager
 from main.models import TransactionAnalysis
 import os
 from dotenv import load_dotenv
@@ -47,7 +47,7 @@ def test_create_transaction(client, api_key,mocker):
         return_value=True
     )
     mocker.patch(
-        "main.database_connection.DatabaseManager.save_transaction_analysis",
+        "main.database_manager.DatabaseManager.save_transaction_analysis",
         return_value=True
     )
     transaction = {
@@ -105,7 +105,7 @@ def test_get_analyses(client, api_key, mocker):
         "created_at": "2025-05-07T14:30:45Z"
     }]
     
-    mocker.patch("main.database_connection.DatabaseManager.get_all_analyses", 
+    mocker.patch("main.database_manager.DatabaseManager.get_all_analyses", 
                  return_value=mock_data)
     with client.application.app_context():
         response = client.get("/analyses", headers={"X-API-KEY": api_key})
@@ -148,7 +148,7 @@ def test_get_admin_notifications(client, api_key, mocker):
         "llm_analysis": '{"reasoning": "High risk due to geographic anomalies"}'
     }]
     
-    mocker.patch("main.database_connection.DatabaseManager.get_high_risk_analyses", 
+    mocker.patch("main.database_manager.DatabaseManager.get_high_risk_analyses", 
                  return_value=mock_data)
     
     with client.application.app_context():

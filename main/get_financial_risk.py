@@ -1,5 +1,5 @@
 from .llm_int_deepseek import analyse_transaction_deepseek
-from .database_connection import DatabaseManager
+from .database_manager import DatabaseManager
 from .validator import validate_transaction
 from flask import jsonify
 
@@ -9,10 +9,11 @@ def get_financial_risk_analysis(data,save_to_db=True):
             raise ValueError("Invalid transaction data format")
                 
         llm_response = analyse_transaction_deepseek(data)
-        return jsonify({
+        response = jsonify({
             "message": "Transaction validated and analyzed.",
             "llm_result": llm_response
         }), 201
+        return response
 
     except ValueError as ve:
         return jsonify({"error": str(ve)}), 422

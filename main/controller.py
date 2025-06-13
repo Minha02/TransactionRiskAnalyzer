@@ -12,15 +12,10 @@ main_bp = Blueprint('main', __name__)
 def create_transaction():
     try:
         transaction = request.get_json(force=True)
-        validate_transaction(transaction)
         
-        llm_response = analyse_transaction_deepseek(transaction)
-        get_financial_risk_analysis(transaction, save_to_db=True)
-        
-        return jsonify({
-            "message": "Transaction validated and analyzed.",
-            "llm_result": llm_response
-        }), 201
+        llm_response= get_financial_risk_analysis(transaction, save_to_db=True)
+        print(llm_response)
+        return llm_response
 
     except ValueError as ve:
         return jsonify({"error": str(ve)}), 422
@@ -73,7 +68,6 @@ def get_analyses():
 @require_auth  
 def get_admin_notifications():
     try:
-
         high_risk_analyses = get_high_risk_history()
         if high_risk_analyses is None:
             high_risk_analyses = []

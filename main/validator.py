@@ -9,7 +9,7 @@ def validate_transaction(transaction: dict):
     transaction_id_validator(transaction)
     nested_fields_validator(transaction)
     logger.info("Transaction validated successfully.")
-
+    return True
 
 def json_schema_validator(transaction: dict):
     required_fields = [

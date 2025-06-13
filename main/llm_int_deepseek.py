@@ -4,7 +4,7 @@ import json
 import requests
 from flask import abort
 from dotenv import load_dotenv
-from .database_connection import DatabaseManager
+from .database_manager import DatabaseManager
 
 load_dotenv() 
 API_URL = 'https://openrouter.ai/api/v1/chat/completions'
